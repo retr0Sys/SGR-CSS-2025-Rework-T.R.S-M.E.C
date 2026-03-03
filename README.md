@@ -281,7 +281,7 @@ java -jar target/sistema-gestion-restaurante-2.0.0.jar
 | Nombre | Usuario de GitHub |
 | :--- | :--- |
 | **Ezequiel Costa** | [@Costa200513](https://github.com/Costa200513) |
-| **Thiago Sosa** | [@RetrOSys](https://github.com/RetrOSys) |
+| **Thiago Sosa** | [@RetrOSys](https://github.com/retr0Sys) |
 
 ---
 
