@@ -1,2 +1,64 @@
-# Auto detect text files and perform LF normalization
+# =====================================================
+# SGR: Sistema de Gestión de Restaurantes CSS
+# .gitattributes — Normalización de archivos
+# =====================================================
+# Asegura que todos los archivos de texto se guarden con
+# saltos de línea LF (Linux/Mac), evitando problemas
+# entre Windows, Linux y macOS.
+# =====================================================
+
+# Todos los archivos de texto se normalizan a LF
 * text=auto
+
+# Archivos binarios (imágenes, ejecutables, etc.) no se tocan
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.exe binary
+*.dll binary
+*.so binary
+*.o binary
+*.class binary
+*.jar binary
+*.war binary
+*.ear binary
+*.zip binary
+*.rar binary
+*.7z binary
+*.tar binary
+*.gz binary
+*.iso binary
+*.img binary
+*.mp3 binary
+*.mp4 binary
+*.avi binary
+*.mov binary
+*.wmv binary
+*.flv binary
+*.webm binary
+*.mkv binary
+*.ogg binary
+*.wav binary
+*.aac binary
+*.flac binary
+*.zip binary
+*.rar binary
+*.7z binary
+*.tar binary
+*.gz binary
+*.iso binary
+*.img binary
+*.mp3 binary
+*.mp4 binary
+*.avi binary
+*.mov binary
+*.wmv binary
+*.flv binary
+*.webm binary
+*.mkv binary
+*.ogg binary
+*.wav binary
+*.aac binary
+*.flac binary

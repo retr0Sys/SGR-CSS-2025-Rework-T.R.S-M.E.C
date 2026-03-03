@@ -1,0 +1,32 @@
+# =====================================================
+# SGR: Sistema de Gestión de Restaurantes CSS
+# Docker Compose — PostgreSQL 16
+# =====================================================
+# Uso:
+#   docker-compose up -d        → Levantar contenedor
+#   docker-compose down         → Detener contenedor
+#   docker-compose down -v      → Detener y eliminar volumen (reset DB)
+# =====================================================
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: sgr-css-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${DB_NAME:-restaurantecss}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d restaurantecss" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
