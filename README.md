@@ -170,44 +170,50 @@ java -jar target/sistema-gestion-restaurante-2.0.0.jar
 <p align="center">
   <i>Modulo de Mesas (V2).</i>
   <br>
-  <img src="src/main/java/com/css/restaurante/assets/pic-mesas.png" alt="Modulo de Mesas V2" width="600" />
+  <img src="https://github.com/user-attachments/assets/0bc77c71-d797-49e2-a948-a375d497f6f6" alt="Modulo de Mesas V2" width="600" />
 </p>
+
 
 <p align="center">
   <i>Modulo de Carta (V2).</i>
   <br>
-  <img src="src/main/java/com/css/restaurante/assets/pic-carta.png" alt="Modulo de Carta V2" width="600" />
+  <img src="https://github.com/user-attachments/assets/82c93d5e-8b8f-4093-8f7e-48dddadbcf6b" alt="Modulo de Carta V2" width="600" />
 </p>
 
 <p align="center">
   <i>Modulo de Cocina (V2).</i>
   <br>
-  <img src="src/main/java/com/css/restaurante/assets/pic-cocina.png" alt="Modulo de Cocina V2" width="600" />
+  <img src="https://github.com/user-attachments/assets/12f42de3-ef47-4aeb-804f-f829b113197a" alt="Modulo de Cocina V2" width="600" />
 </p>
+
 
 <p align="center">
   <i>Modulo de Facturacion (V2).</i>
   <br>
-  <img src="src/main/java/com/css/restaurante/assets/pic-fact.png" alt="Modulo de Facturacion V2" width="600" />
+  <img src="https://github.com/user-attachments/assets/84069547-d764-40b6-af21-85be3c1fe701" alt="Modulo de Facturacion V2" width="600" />
 </p>
+
 
 <p align="center">
   <i>Modulo de Resumen (V2).</i>
   <br>
-  <img src="src/main/java/com/css/restaurante/assets/pic-resumen.png" alt="Modulo de Resumen V2" width="600" />
+  <img src="https://github.com/user-attachments/assets/f04b7ef9-a377-42b9-8003-16f7809390b8" alt="Modulo de Resumen V2" width="600" />
 </p>
+
 
 <p align="center">
   <i>Acerca de (V2).</i>
   <br>
-  <img src="src/main/java/com/css/restaurante/assets/pic-acerca.png" alt="Acerca de V2" width="600" />
+  <img src="https://github.com/user-attachments/assets/3fbd9565-19f7-4984-8496-3f44fbe369bc" alt="Acerca de V2" width="600" />
 </p>
+
 
 <p align="center">
   <i>Codigo fuente (V2).</i>
   <br>
-  <img src="src/main/java/com/css/restaurante/assets/pic-code.png" alt="Codigo fuente V2" width="600" />
+  <img src="https://github.com/user-attachments/assets/3ba23e55-7aa4-4687-bcca-2270b625dbd9" alt="Codigo fuente V2" width="600" />
 </p>
+
 
 ### Screenshots V1
 
