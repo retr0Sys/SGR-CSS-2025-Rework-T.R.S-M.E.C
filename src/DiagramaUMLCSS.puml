@@ -1,0 +1,216 @@
+@startuml
+package abstractas{
+abstract class Producto{
+
+        - int id
+        - String nombre
+        - double precio
+        - int estado
+
+        + Producto(int id, String nombre, double precio, int estado)
+        + double getPrecio()
+        + void setPrecio(double precio)
+        + String getNombre()
+        + void setNombre(String nombre)
+        + int getId()
+        + void setId(int id)
+        + int getEstado()
+        + void setEstado(int estado)
+        + void calcularImpuesto()
+        + String getCategoria()
+    }
+}
+package concret{
+class Bebida {
+        + Bebida(int id, String nombre, double precio, int estado)
+        + void calcularImpuesto()
+        + String getCategoria()
+ }
+
+class Cuenta {
+        - int idCuenta
+        - int idMesa
+        - Timestamp fechaApertura
+        - Timestamp fechaCierre
+        - int estado
+
+        + Cuenta()
+        + Cuenta(int idCuenta, int idMesa, Timestamp fechaApertura, Timestamp fechaCierre, int estado)
+        + Cuenta(int idMesa, int estado)
+
+        + int getIdCuenta()
+        + void setIdCuenta(int idCuenta)
+        + int getIdMesa()
+        + void setIdMesa(int idMesa)
+        + Timestamp getFechaApertura()
+        + void setFechaApertura(Timestamp fechaApertura)
+        + Timestamp getFechaCierre()
+        + void setFechaCierre(Timestamp fechaCierre)
+        + int getEstado()
+        + void setEstado(int estado)
+        + String toString()
+    }
+class Comida {
+        + Comida(int id, String nombre, double precio, int estado)
+        + void calcularImpuesto()
+        + String getCategoria()
+
+}
+
+class Factura {
+        # Mesa mesa
+        # Pedido pedido
+    }
+
+class Mesa {
+        + String JPMesasIni
+        - int idMesa
+        - int capacidad
+        - String estado
+
+        + Mesa()
+        + Mesa(int idMesa, int capacidad, String estado)
+
+        + int getIdMesa()
+        + void setIdMesa(int idMesa)
+        + int getCapacidad()
+        + void setCapacidad(int capacidad)
+        + String getEstado()
+        + void setEstado(String estado)
+        + String toString()
+    }
+
+class Mesero {
+        - int idMesero
+        - String nombre
+        - String apellido
+        - String telefono
+        - boolean activo
+
+        + Mesero()
+        + Mesero(int idMesero, String nombre, String apellido, String telefono, boolean activo)
+
+        + int getIdMesero()
+        + void setIdMesero(int idMesero)
+        + String getNombre()
+        + void setNombre(String nombre)
+        + String getApellido()
+        + void setApellido(String apellido)
+        + String getTelefono()
+        + void setTelefono(String telefono)
+        + boolean isActivo()
+        + void setActivo(boolean activo)
+        + String toString()
+    }
+
+
+class Pedido {
+        - int idPedido
+        - int idCuenta
+        - int idProducto
+        - int cantidad
+        - Timestamp fechaHora
+        - String nombreProducto
+        - double precioProducto
+
+        + Pedido(int idPedido, int idCuenta, int idProducto, int cantidad, Timestamp fechaHora)
+        + Pedido(int idPedido, int idCuenta, int idProducto, int cantidad, Timestamp fechaHora, String nombreProducto, double precioProducto)
+
+        + int getIdPedido()
+        + int getIdCuenta()
+        + int getIdProducto()
+        + int getCantidad()
+        + Timestamp getFechaHora()
+        + String getNombreProducto()
+        + void setNombreProducto(String nombreProducto)
+        + double getPrecioProducto()
+        + void setPrecioProducto(double precioProducto)
+        + double getSubtotal()
+        + String toString()
+    }
+
+class Postre {
+        + Postre(int id, String nombre, double precio, int estado)
+        + void calcularImpuesto()
+        + String getCategoria()
+    }
+
+class Reserva {
+        - int idReserva
+        - int idMesa
+        - String nombre
+        - String apellido
+        - Date fecha
+        - Time hora
+
+        + Reserva()
+        + Reserva(int idReserva, int idMesa, String nombre, String apellido, Date fecha, Time hora)
+        + Reserva(int idMesa, String nombre, String apellido, Date fecha, Time hora)
+
+        + int getIdReserva()
+        + void setIdReserva(int idReserva)
+        + int getIdMesa()
+        + void setIdMesa(int idMesa)
+        + String getNombre()
+        + void setNombre(String nombre)
+        + String getApellido()
+        + void setApellido(String apellido)
+        + Date getFecha()
+        + void setFecha(Date fecha)
+        + Time getHora()
+        + void setHora(Time hora)
+        + String toString()
+    }
+ }
+package interfaces{
+interface CartaService {
+        + void mostrarCarta()
+        + void agregarItem(String item)
+        + void eliminarItem(String item)
+        + void actualizarItem(String item, String nuevoItem)
+    }
+
+class CartaServiceImpl {
+        + void mostrarCarta()
+        + void agregarItem(String item)
+        + void eliminarItem(String item)
+        + void actualizarItem(String item, String nuevoItem)
+    }
+
+
+
+interface  IPedidoService {
+
+        + String crearPedido(int mesaID)
+        + void agregarItem(String nombre, String productoId, int cantidad)
+        + double calcularTotal(String pedidoId)
+        + void cerrarPedido(String pedidoId) throws IllegalStateException
+    }
+
+interface IPedidoDAO {
+
+    + void agregarPedido(int idCuenta, int idProducto, int cantidad)
+    + List<Pedido> listarPorCuenta(int idCuenta)
+    + List<Pedido> listar()
+    + double calcularTotalCuenta(int idCuenta)
+    + List<Pedido> listarPorCuentaConNombre(int idCuenta)
+    + List<Pedido> listarPendientes()
+    + void actualizarEstado(int idPedido, String nuevoEstado)
+
+}
+
+
+Producto <|-- Comida
+Producto <|-- Bebida
+Factura --> Mesa
+Factura --> Pedido
+Producto <|-- Postre
+CartaService <|.. CartaServiceImpl
+
+
+
+
+
+
+
+@enduml
