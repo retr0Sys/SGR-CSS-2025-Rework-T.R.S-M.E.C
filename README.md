@@ -146,7 +146,7 @@ java -jar target/sistema-gestion-restaurante-2.0.0.jar
 ### 4. 💰 Facturacion
 - Seleccionar mesa con cuenta abierta.
 - Aplicar descuento (0%, 5%, 10%, 15%) y ver desglose con IVA (22%).
-- **Generar factura PDF** en el escritorio al cerrar cuenta.
+- **Generar factura PDF** en una carpeta llamada Facturas (por defecto)
 
 ### 5. 📊 Resumen
 - Tarjetas de estadisticas: ventas del dia, pedidos, producto top.
