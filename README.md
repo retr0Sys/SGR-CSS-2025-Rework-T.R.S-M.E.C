@@ -207,14 +207,6 @@ java -jar target/sistema-gestion-restaurante-2.0.0.jar
   <img src="https://github.com/user-attachments/assets/3fbd9565-19f7-4984-8496-3f44fbe369bc" alt="Acerca de V2" width="600" />
 </p>
 
-
-<p align="center">
-  <i>Codigo fuente (V2).</i>
-  <br>
-  <img src="https://github.com/user-attachments/assets/3ba23e55-7aa4-4687-bcca-2270b625dbd9" alt="Codigo fuente V2" width="600" />
-</p>
-
-
 ### Screenshots V1
 
 <p align="center">
