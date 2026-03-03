@@ -17,8 +17,6 @@
 El **Sistema de Gestion de Restaurantes (SGR)**, desarrollado en **Java**, es una plataforma robusta diseñada a medida para el restaurante **CSS**.  
 Su objetivo es optimizar y automatizar la gestion diaria del establecimiento, abarcando desde la **toma de pedidos** y el **control de cocina** hasta la **facturacion detallada** y la **generacion de informes**.
 
-> **⚠️ Restriccion de Uso:** Este sistema ha sido desarrollado exclusivamente para el restaurante CSS y su uso esta limitado a este establecimiento.
-
 ---
 
 ## 📌 Versiones
