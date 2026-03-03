@@ -31,7 +31,7 @@ Rework total del sistema con arquitectura moderna, UI renovada y mejoras de segu
 | :--- | :--- |
 | **Arquitectura Maven** | Estructura estandar `src/main/java`, gestion de dependencias con `pom.xml` |
 | **PostgreSQL + Docker** | Base de datos PostgreSQL 16 conteneurizada con `docker-compose` |
-| **HikariCP** | Connection pooling de alto rendimiento (10 conexiones) |
+| **HikariCP** | Connection pooling de alto rendimiento |
 | **FlatLaf** | UI moderna con tema claro/oscuro intercambiable |
 | **Seguridad** | Credenciales en `.env`, `InputValidator` anti-XSS, `PreparedStatements` |
 | **PDF** | Generacion de facturas PDF con Apache PDFBox |
