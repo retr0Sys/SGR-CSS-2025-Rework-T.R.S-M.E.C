@@ -180,6 +180,6 @@ public class FacturaPDF {
     }
 
     private static String fmt(double v) {
-        return String.format("%.2f", v);
+        return String.format("%.0f", v);
     }
 }

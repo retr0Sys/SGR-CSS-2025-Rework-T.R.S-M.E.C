@@ -12,11 +12,16 @@ import java.util.List;
 public class CuentaDAO {
 
     public void insertar(Cuenta c) throws SQLException {
-        String sql = "INSERT INTO cuenta (id_mesa, estado) VALUES (?, ?)";
+        String sql = "INSERT INTO cuenta (id_mesa, id_mesero, estado) VALUES (?, ?, ?)";
         try (Connection cn = ConexionDB.getConnection();
                 PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, c.getIdMesa());
-            ps.setInt(2, c.getEstado());
+            if (c.getIdMesero() != null) {
+                ps.setInt(2, c.getIdMesero());
+            } else {
+                ps.setNull(2, Types.INTEGER);
+            }
+            ps.setInt(3, c.getEstado());
             ps.executeUpdate();
 
             try (ResultSet keys = ps.getGeneratedKeys()) {
@@ -64,6 +69,25 @@ public class CuentaDAO {
         }
     }
 
+    public void actualizarMesero(int idMesa, int idMesero) throws SQLException {
+        String sql = "UPDATE cuenta SET id_mesero = ? WHERE id_mesa = ? AND estado = 1";
+        try (Connection cn = ConexionDB.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, idMesero);
+            ps.setInt(2, idMesa);
+            ps.executeUpdate();
+        }
+    }
+
+    public void desasignarMesero(int idMesa) throws SQLException {
+        String sql = "UPDATE cuenta SET id_mesero = NULL WHERE id_mesa = ? AND estado = 1";
+        try (Connection cn = ConexionDB.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, idMesa);
+            ps.executeUpdate();
+        }
+    }
+
     public List<Cuenta> listar() throws SQLException {
         String sql = "SELECT * FROM cuenta ORDER BY fecha_apertura DESC";
         List<Cuenta> lista = new ArrayList<>();
@@ -78,9 +102,12 @@ public class CuentaDAO {
     }
 
     private Cuenta mapearCuenta(ResultSet rs) throws SQLException {
+        int idMesero = rs.getInt("id_mesero");
+        Integer mesero = rs.wasNull() ? null : idMesero;
         return new Cuenta(
                 rs.getInt("id_cuenta"),
                 rs.getInt("id_mesa"),
+                mesero,
                 rs.getTimestamp("fecha_apertura"),
                 rs.getTimestamp("fecha_cierre"),
                 rs.getInt("estado"));

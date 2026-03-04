@@ -125,11 +125,11 @@ public class PanelResumen extends JPanel implements MenuPuntoVenta.Refrescable {
                                     "FROM pedido p JOIN catalogo_producto cp ON p.id_producto = cp.id_producto " +
                                     "WHERE DATE(p.fecha_hora) = CURRENT_DATE AND p.estado != 'Cancelado'")) {
                 if (rs.next())
-                    lblVentasHoy.setText("$" + String.format("%.2f", rs.getDouble("total")));
+                    lblVentasHoy.setText("$" + String.format("%.0f", rs.getDouble("total")));
             }
             try (Statement st = cn.createStatement();
                     ResultSet rs = st.executeQuery(
-                            "SELECT COUNT(*) AS total FROM pedido WHERE DATE(fecha_hora) = CURRENT_DATE")) {
+                            "SELECT COUNT(*) AS total FROM pedido WHERE DATE(fecha_hora) = CURRENT_DATE AND estado != 'Cancelado'")) {
                 if (rs.next())
                     lblPedidosHoy.setText(String.valueOf(rs.getInt("total")));
             }
@@ -160,8 +160,8 @@ public class PanelResumen extends JPanel implements MenuPuntoVenta.Refrescable {
             while (rs.next()) {
                 modelo.addRow(new Object[] {
                         "Mesa " + rs.getInt("mesa"), rs.getString("producto"),
-                        rs.getInt("cantidad"), String.format("$%.2f", rs.getDouble("precio")),
-                        String.format("$%.2f", rs.getDouble("subtotal")), rs.getString("estado")
+                        rs.getInt("cantidad"), String.format("$%.0f", rs.getDouble("precio")),
+                        String.format("$%.0f", rs.getDouble("subtotal")), rs.getString("estado")
                 });
             }
         } catch (Exception ex) {
@@ -188,8 +188,8 @@ public class PanelResumen extends JPanel implements MenuPuntoVenta.Refrescable {
                 while (rs.next()) {
                     modelo.addRow(new Object[] {
                             rs.getString("producto"), rs.getInt("cantidad"),
-                            String.format("$%.2f", rs.getDouble("precio")),
-                            String.format("$%.2f", rs.getDouble("subtotal")), rs.getString("estado"),
+                            String.format("$%.0f", rs.getDouble("precio")),
+                            String.format("$%.0f", rs.getDouble("subtotal")), rs.getString("estado"),
                             rs.getTimestamp("fecha_hora") != null
                                     ? new java.text.SimpleDateFormat("HH:mm").format(rs.getTimestamp("fecha_hora"))
                                     : ""
@@ -217,8 +217,8 @@ public class PanelResumen extends JPanel implements MenuPuntoVenta.Refrescable {
                 modelo.addRow(new Object[] {
                         medallas[pos - 1] + " #" + pos, rs.getString("producto"),
                         rs.getInt("total_vendido"),
-                        String.format("$%.2f", rs.getDouble("precio")),
-                        String.format("$%.2f", rs.getDouble("ingresos"))
+                        String.format("$%.0f", rs.getDouble("precio")),
+                        String.format("$%.0f", rs.getDouble("ingresos"))
                 });
                 pos++;
             }

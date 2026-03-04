@@ -23,7 +23,7 @@ public class PanelCarta extends JPanel implements MenuPuntoVenta.Refrescable {
 
     private JTextField txtNombre, txtPrecio, txtStock;
     private JComboBox<String> cbCategoria, cbEstado;
-    private JButton btnCrear, btnModificar;
+    private JButton btnCrear, btnModificar, btnEliminar;
     private int productoSeleccionadoId = -1;
 
     public PanelCarta() {
@@ -122,6 +122,12 @@ public class PanelCarta extends JPanel implements MenuPuntoVenta.Refrescable {
         btnModificar.setEnabled(false);
         btnModificar.addActionListener(e -> modificarProducto());
         panel.add(btnModificar);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        btnEliminar = crearBotonAccion("🗑 Eliminar Producto", ThemeManager.danger());
+        btnEliminar.setEnabled(false);
+        btnEliminar.addActionListener(e -> eliminarProducto());
+        panel.add(btnEliminar);
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
 
         JButton btnLimpiar = crearBotonAccion("✕ Limpiar", ThemeManager.textMuted());
@@ -225,7 +231,7 @@ public class PanelCarta extends JPanel implements MenuPuntoVenta.Refrescable {
             for (Producto p : productos) {
                 modelo.addRow(new Object[] {
                         p.getId(), p.getNombre(),
-                        String.format("$%.2f", p.getPrecio()),
+                        String.format("$%.0f", p.getPrecio()),
                         p.getCategoria().toString(), p.getStock(),
                         p.getEstado() == 1 ? "Disponible" : "No disponible"
                 });
@@ -247,6 +253,7 @@ public class PanelCarta extends JPanel implements MenuPuntoVenta.Refrescable {
         cbCategoria.setSelectedItem(modelo.getValueAt(row, 3));
         cbEstado.setSelectedItem(modelo.getValueAt(row, 5));
         btnModificar.setEnabled(true);
+        btnEliminar.setEnabled(true);
     }
 
     /** Crea un producto con validación de seguridad completa */
@@ -312,6 +319,39 @@ public class PanelCarta extends JPanel implements MenuPuntoVenta.Refrescable {
         }
     }
 
+    private void eliminarProducto() {
+        if (productoSeleccionadoId < 0)
+            return;
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "¿Está seguro que desea eliminar este producto?\nEsta acción no se puede deshacer.",
+                "Confirmar Eliminación", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                productoDAO.eliminar(productoSeleccionadoId);
+                JOptionPane.showMessageDialog(this, "Producto eliminado exitosamente.", "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
+                limpiarFormulario();
+                cargarProductos(null);
+            } catch (java.sql.SQLException ex) {
+                if ("23503".equals(ex.getSQLState())) {
+                    JOptionPane.showMessageDialog(this,
+                            "No se puede eliminar el producto porque tiene pedidos asociados en el historial de facturación.\n"
+                                    +
+                                    "Se recomienda marcar el producto como 'No disponible'.",
+                            "Error de Integridad", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Error al eliminar: " + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error inesperado al eliminar: " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
     private void limpiarFormulario() {
         txtNombre.setText("");
         txtPrecio.setText("");
@@ -320,6 +360,7 @@ public class PanelCarta extends JPanel implements MenuPuntoVenta.Refrescable {
         cbEstado.setSelectedIndex(0);
         productoSeleccionadoId = -1;
         btnModificar.setEnabled(false);
+        btnEliminar.setEnabled(false);
         tabla.clearSelection();
     }
 

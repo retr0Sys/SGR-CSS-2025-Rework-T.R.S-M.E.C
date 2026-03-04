@@ -152,6 +152,8 @@ public class PanelFacturacion extends JPanel implements MenuPuntoVenta.Refrescab
             for (Mesa m : mesaDAO.listar()) {
                 if (cuentaDAO.tieneCuentaAbierta(m.getIdMesa())) {
                     cbMesa.addItem("Mesa " + m.getIdMesa() + " (Cuenta abierta)");
+                } else if ("Ocupada".equals(m.getEstado())) {
+                    cbMesa.addItem("Mesa " + m.getIdMesa() + " (Sin cuenta)");
                 }
             }
         } catch (Exception ex) {
@@ -180,8 +182,8 @@ public class PanelFacturacion extends JPanel implements MenuPuntoVenta.Refrescab
                 if (!"Cancelado".equals(p.getEstado().getValor())) {
                     modelo.addRow(new Object[] {
                             p.getNombreProducto(), p.getCantidad(),
-                            String.format("$%.2f", p.getPrecioProducto()),
-                            String.format("$%.2f", p.getSubtotal())
+                            String.format("$%.0f", p.getPrecioProducto()),
+                            String.format("$%.0f", p.getSubtotal())
                     });
                     subtotalActual += p.getSubtotal();
                 }
@@ -200,10 +202,10 @@ public class PanelFacturacion extends JPanel implements MenuPuntoVenta.Refrescab
         double iva = baseImponible * 0.22;
         double total = baseImponible + iva;
 
-        lblSubtotal.setText("Subtotal: $" + String.format("%.2f", subtotalActual));
-        lblDescuento.setText("Descuento: -$" + String.format("%.2f", descuento));
-        lblIVA.setText("IVA (22%): $" + String.format("%.2f", iva));
-        lblTotal.setText("Total: $" + String.format("%.2f", total));
+        lblSubtotal.setText("Subtotal: $" + String.format("%.0f", subtotalActual));
+        lblDescuento.setText("Descuento: -$" + String.format("%.0f", descuento));
+        lblIVA.setText("IVA (22%): $" + String.format("%.0f", iva));
+        lblTotal.setText("Total: $" + String.format("%.0f", total));
     }
 
     private void cerrarCuenta() {
@@ -215,6 +217,44 @@ public class PanelFacturacion extends JPanel implements MenuPuntoVenta.Refrescab
         try {
             int idMesa = Integer.parseInt(sel.split(" ")[1]);
 
+            // FIX: Permitir cerrar cuenta sin facturar si la mesa está vacía / sin pedidos
+            // registrados
+            int idCuentaCheck = cuentaDAO.obtenerIdCuentaAbierta(idMesa);
+            if (idCuentaCheck < 0) {
+                int resp = JOptionPane.showConfirmDialog(this,
+                        "La mesa está marcada como ocupada pero no tiene cuenta activa.\n" +
+                                "¿Desea liberarla a Limpieza?",
+                        "Liberar Mesa", JOptionPane.YES_NO_OPTION);
+                if (resp == JOptionPane.YES_OPTION) {
+                    mesaDAO.actualizarEstado(idMesa, "Limpieza");
+                    mesaDAO.desasignarMesero(idMesa);
+                    JOptionPane.showMessageDialog(this, "Mesa " + idMesa + " liberada a Limpieza.");
+                    modelo.setRowCount(0);
+                    subtotalActual = 0;
+                    pedidosActuales.clear();
+                    actualizarTotales();
+                    cargarMesas();
+                }
+                return;
+            }
+            if (!pedidoDAO.tienePedidosNoCancelados(idCuentaCheck)) {
+                int resp = JOptionPane.showConfirmDialog(this,
+                        "La mesa no tiene pedidos registrados.\n¿Desea cerrar la cuenta sin emitir factura?",
+                        "Cerrar sin facturar", JOptionPane.YES_NO_OPTION);
+                if (resp == JOptionPane.YES_OPTION) {
+                    cuentaDAO.cerrarCuenta(idMesa);
+                    mesaDAO.actualizarEstado(idMesa, "Limpieza");
+                    mesaDAO.desasignarMesero(idMesa);
+                    JOptionPane.showMessageDialog(this, "Cuenta cerrada sin factura.\nMesa " + idMesa + " -> Limpieza");
+                    modelo.setRowCount(0);
+                    subtotalActual = 0;
+                    pedidosActuales.clear();
+                    actualizarTotales();
+                    cargarMesas();
+                }
+                return;
+            }
+
             // Calcular totales para el PDF
             String descStr = (String) cbDescuento.getSelectedItem();
             double descPct = descStr != null ? Double.parseDouble(descStr.replace("%", "")) / 100.0 : 0;
@@ -225,7 +265,7 @@ public class PanelFacturacion extends JPanel implements MenuPuntoVenta.Refrescab
             String metodoPago = (String) cbMetodoPago.getSelectedItem();
 
             int confirm = JOptionPane.showConfirmDialog(this,
-                    "Cerrar cuenta de la Mesa " + idMesa + "?\nTotal: $" + String.format("%.2f", total),
+                    "Cerrar cuenta de la Mesa " + idMesa + "?\nTotal: $" + String.format("%.0f", total),
                     "Confirmar cierre", JOptionPane.YES_NO_OPTION);
             if (confirm != JOptionPane.YES_OPTION)
                 return;

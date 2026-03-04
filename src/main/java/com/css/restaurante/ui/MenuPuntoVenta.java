@@ -28,6 +28,7 @@ public class MenuPuntoVenta extends JFrame {
     private static final String PANEL_COCINA = "cocina";
     private static final String PANEL_FACTURACION = "facturacion";
     private static final String PANEL_RESUMEN = "resumen";
+    private static final String PANEL_DESEMPENO = "desempeno";
     private static final String PANEL_ACERCA = "acerca";
 
     public MenuPuntoVenta() {
@@ -78,6 +79,9 @@ public class MenuPuntoVenta extends JFrame {
         contentPanel.add(new PanelCocina(), PANEL_COCINA);
         contentPanel.add(new PanelFacturacion(), PANEL_FACTURACION);
         contentPanel.add(new PanelResumen(), PANEL_RESUMEN);
+        if (SesionManager.esGerente()) {
+            contentPanel.add(new PanelDesempeno(), PANEL_DESEMPENO);
+        }
         contentPanel.add(crearPanelAcerca(), PANEL_ACERCA);
 
         rightPanel.add(contentPanel, BorderLayout.CENTER);
@@ -142,8 +146,13 @@ public class MenuPuntoVenta extends JFrame {
 
         // Seccion: Finanzas
         sidebar.add(crearSeccionLabel("FINANZAS"));
-        sidebar.add(crearBotonSidebar("Facturacion", "facturacion", PANEL_FACTURACION, "Facturacion"));
+        if (SesionManager.puedeFacturar()) {
+            sidebar.add(crearBotonSidebar("Facturacion", "facturacion", PANEL_FACTURACION, "Facturacion"));
+        }
         sidebar.add(crearBotonSidebar("Resumen", "resumen", PANEL_RESUMEN, "Resumen"));
+        if (SesionManager.esGerente()) {
+            sidebar.add(crearBotonSidebar("Desempeño", "desempeno", PANEL_DESEMPENO, "Desempeño de Meseros"));
+        }
 
         sidebar.add(Box.createVerticalGlue());
 
@@ -175,6 +184,20 @@ public class MenuPuntoVenta extends JFrame {
         sidebar.add(Box.createRigidArea(new Dimension(0, 2)));
 
         sidebar.add(crearBotonSidebar("Acerca de", "acerca", PANEL_ACERCA, "Acerca de"));
+        sidebar.add(Box.createRigidArea(new Dimension(0, 2)));
+
+        // ── Cerrar Sesión ──
+        JButton btnLogout = crearBotonSidebarAction("Cerrar Sesión", "logout");
+        btnLogout.addActionListener(e -> {
+            int resp = JOptionPane.showConfirmDialog(this, "¿Estás seguro que deseas cerrar sesión?",
+                    "Cerrar Sesión", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (resp == JOptionPane.YES_OPTION) {
+                SesionManager.cerrarSesion();
+                dispose();
+                SwingUtilities.invokeLater(() -> new PanelLogin().setVisible(true));
+            }
+        });
+        sidebar.add(btnLogout);
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
 
         // Boton activo por defecto = Mesas
@@ -236,6 +259,33 @@ public class MenuPuntoVenta extends JFrame {
         return btn;
     }
 
+    private JButton crearBotonSidebarAction(String texto, String iconKey) {
+        JButton btn = new JButton(" " + texto);
+        btn.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        btn.setForeground(ThemeManager.danger());
+        btn.setBackground(ThemeManager.bgSidebar());
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setHorizontalAlignment(SwingConstants.LEFT);
+        btn.setMaximumSize(new Dimension(220, 40));
+        btn.setPreferredSize(new Dimension(220, 40));
+        btn.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 8));
+
+        btn.setIcon(IconFactory.crear(iconKey, 18, ThemeManager.danger()));
+
+        btn.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(ThemeManager.hoverBg());
+            }
+
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(ThemeManager.bgSidebar());
+            }
+        });
+        return btn;
+    }
+
     private JSeparator crearSeparador() {
         JSeparator sep = new JSeparator();
         sep.setForeground(ThemeManager.border());
@@ -257,6 +307,15 @@ public class MenuPuntoVenta extends JFrame {
 
         JPanel rightHeader = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
         rightHeader.setBackground(ThemeManager.bgDark());
+
+        JLabel lblUsuario = new JLabel("👤 " + SesionManager.getNombreDisplay());
+        lblUsuario.setFont(new Font("SansSerif", Font.BOLD, 14));
+        lblUsuario.setForeground(ThemeManager.accentText());
+        rightHeader.add(lblUsuario);
+
+        JLabel lblDiv = new JLabel(" | ");
+        lblDiv.setForeground(ThemeManager.textMuted());
+        rightHeader.add(lblDiv);
 
         JLabel lblClock = new JLabel();
         lblClock.setFont(new Font("SansSerif", Font.PLAIN, 13));

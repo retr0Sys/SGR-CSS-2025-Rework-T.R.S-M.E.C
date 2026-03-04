@@ -1,6 +1,6 @@
 package com.css.restaurante.principal;
 
-import com.css.restaurante.ui.MenuPuntoVenta;
+import com.css.restaurante.ui.PanelLogin;
 import com.css.restaurante.ui.ThemeManager;
 
 import javax.swing.*;
@@ -176,7 +176,7 @@ public class BienvenidaMenuInicial extends JFrame {
         JButton btnIngresar = crearBotonPrincipal("Ingresar al Sistema");
         btnIngresar.addActionListener(e -> {
             dispose();
-            SwingUtilities.invokeLater(() -> new MenuPuntoVenta().setVisible(true));
+            SwingUtilities.invokeLater(() -> new PanelLogin().setVisible(true));
         });
         card.add(btnIngresar);
         card.add(Box.createRigidArea(new Dimension(0, 12)));

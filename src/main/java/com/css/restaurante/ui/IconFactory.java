@@ -36,6 +36,9 @@ public class IconFactory {
             case "acerca" -> dibujarAcerca(g, s);
             case "tema_sol" -> dibujarSol(g, s);
             case "tema_luna" -> dibujarLuna(g, s);
+            case "desempeno" -> dibujarDesempeno(g, s);
+            case "logout" -> dibujarLogout(g, s);
+            case "login" -> dibujarLogin(g, s);
         }
         g.dispose();
         return new ImageIcon(img);
@@ -170,5 +173,50 @@ public class IconFactory {
         Arc2D inner = new Arc2D.Float(6 * s, 3 * s, 10 * s, 14 * s, 90, -180, Arc2D.OPEN);
         moon.append(inner, true);
         g.draw(moon);
+    }
+
+    // Desempeno: trofeo
+    private static void dibujarDesempeno(Graphics2D g, float s) {
+        g.setStroke(new BasicStroke(1.6f * s, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        // Copa
+        g.draw(new Line2D.Float(5 * s, 3 * s, 15 * s, 3 * s));
+        GeneralPath cup = new GeneralPath();
+        cup.moveTo(5 * s, 3 * s);
+        cup.curveTo(5 * s, 10 * s, 10 * s, 12 * s, 10 * s, 12 * s);
+        cup.curveTo(10 * s, 12 * s, 15 * s, 10 * s, 15 * s, 3 * s);
+        g.draw(cup);
+        // Asas
+        g.draw(new Arc2D.Float(2 * s, 4 * s, 4 * s, 5 * s, 90, 180, Arc2D.OPEN));
+        g.draw(new Arc2D.Float(14 * s, 4 * s, 4 * s, 5 * s, -90, 180, Arc2D.OPEN));
+        // Tallo
+        g.draw(new Line2D.Float(10 * s, 12 * s, 10 * s, 15 * s));
+        // Base
+        g.draw(new Line2D.Float(7 * s, 15 * s, 13 * s, 15 * s));
+        // Estrella pequeña
+        g.fill(new Ellipse2D.Float(9 * s, 6 * s, 2 * s, 2 * s));
+    }
+
+    // Logout: puerta con flecha
+    private static void dibujarLogout(Graphics2D g, float s) {
+        g.setStroke(new BasicStroke(1.6f * s, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        // Puerta
+        g.draw(new Rectangle2D.Float(3 * s, 3 * s, 8 * s, 14 * s));
+        // Flecha hacia la derecha
+        g.draw(new Line2D.Float(12 * s, 10 * s, 18 * s, 10 * s));
+        g.draw(new Line2D.Float(15 * s, 7 * s, 18 * s, 10 * s));
+        g.draw(new Line2D.Float(15 * s, 13 * s, 18 * s, 10 * s));
+    }
+
+    // Login: persona silueta
+    private static void dibujarLogin(Graphics2D g, float s) {
+        g.setStroke(new BasicStroke(1.6f * s, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        // Cabeza
+        g.draw(new Ellipse2D.Float(7 * s, 3 * s, 6 * s, 6 * s));
+        // Cuerpo
+        GeneralPath body = new GeneralPath();
+        body.moveTo(4 * s, 17 * s);
+        body.curveTo(4 * s, 12 * s, 7 * s, 10 * s, 10 * s, 10 * s);
+        body.curveTo(13 * s, 10 * s, 16 * s, 12 * s, 16 * s, 17 * s);
+        g.draw(body);
     }
 }

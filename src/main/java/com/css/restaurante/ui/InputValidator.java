@@ -58,7 +58,7 @@ public final class InputValidator {
      */
     public static boolean esPrecioValido(String precioStr) {
         try {
-            double precio = Double.parseDouble(precioStr.trim());
+            double precio = Double.parseDouble(precioStr.trim().replace(',', '.'));
             return precio > 0 && precio <= 99999.99;
         } catch (NumberFormatException e) {
             return false;
@@ -70,7 +70,7 @@ public final class InputValidator {
      */
     public static double parsePrecio(String precioStr) {
         try {
-            double valor = Double.parseDouble(sanitizar(precioStr));
+            double valor = Double.parseDouble(sanitizar(precioStr).replace(',', '.'));
             return (valor > 0 && valor <= 99999.99) ? valor : -1;
         } catch (NumberFormatException e) {
             return -1;

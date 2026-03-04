@@ -29,7 +29,7 @@ public class ProductoDAO {
         String sql = "SELECT * FROM catalogo_producto WHERE categoria = ? AND estado = 1 ORDER BY nombre";
         List<Producto> productos = new ArrayList<>();
         try (Connection cn = ConexionDB.getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
+                PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setString(1, categoria.getValor());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -43,7 +43,7 @@ public class ProductoDAO {
     public Producto buscarPorId(int idProducto) throws SQLException {
         String sql = "SELECT * FROM catalogo_producto WHERE id_producto = ?";
         try (Connection cn = ConexionDB.getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
+                PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, idProducto);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -57,7 +57,7 @@ public class ProductoDAO {
     public Producto buscarPorNombre(String nombre) throws SQLException {
         String sql = "SELECT * FROM catalogo_producto WHERE LOWER(nombre) = LOWER(?)";
         try (Connection cn = ConexionDB.getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
+                PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setString(1, nombre);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -71,7 +71,7 @@ public class ProductoDAO {
     public int obtenerStock(int idProducto) throws SQLException {
         String sql = "SELECT stock FROM catalogo_producto WHERE id_producto = ?";
         try (Connection cn = ConexionDB.getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
+                PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, idProducto);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -87,7 +87,7 @@ public class ProductoDAO {
     public void crear(Producto p) throws SQLException {
         String sql = "INSERT INTO catalogo_producto (nombre, precio, categoria, stock, estado) VALUES (?, ?, ?, ?, ?)";
         try (Connection cn = ConexionDB.getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, p.getNombre());
             ps.setDouble(2, p.getPrecio());
             ps.setString(3, p.getCategoria().getValor());
@@ -106,7 +106,7 @@ public class ProductoDAO {
     public void actualizar(int idProducto, double nuevoPrecio, int estado) throws SQLException {
         String sql = "UPDATE catalogo_producto SET precio = ?, estado = ? WHERE id_producto = ?";
         try (Connection cn = ConexionDB.getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
+                PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setDouble(1, nuevoPrecio);
             ps.setInt(2, estado);
             ps.setInt(3, idProducto);
@@ -118,11 +118,27 @@ public class ProductoDAO {
         if (nuevoStock < 0) {
             throw new StockInsuficienteException();
         }
-        String sql = "UPDATE catalogo_producto SET stock = ? WHERE id_producto = ?";
+
+        String sql;
+        if (nuevoStock == 0) {
+            sql = "UPDATE catalogo_producto SET stock = ?, estado = 0 WHERE id_producto = ?";
+        } else {
+            sql = "UPDATE catalogo_producto SET stock = ? WHERE id_producto = ?";
+        }
+
         try (Connection cn = ConexionDB.getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
+                PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, nuevoStock);
             ps.setInt(2, idProducto);
+            ps.executeUpdate();
+        }
+    }
+
+    public void eliminar(int idProducto) throws SQLException {
+        String sql = "DELETE FROM catalogo_producto WHERE id_producto = ?";
+        try (Connection cn = ConexionDB.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, idProducto);
             ps.executeUpdate();
         }
     }
@@ -132,8 +148,8 @@ public class ProductoDAO {
     private List<Producto> obtenerProductos(String sql) throws SQLException {
         List<Producto> productos = new ArrayList<>();
         try (Connection cn = ConexionDB.getConnection();
-             Statement st = cn.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
+                Statement st = cn.createStatement();
+                ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {
                 productos.add(mapearProducto(rs));
             }
@@ -148,7 +164,6 @@ public class ProductoDAO {
                 rs.getDouble("precio"),
                 CategoriaProducto.fromString(rs.getString("categoria")),
                 rs.getInt("stock"),
-                rs.getInt("estado")
-        );
+                rs.getInt("estado"));
     }
 }

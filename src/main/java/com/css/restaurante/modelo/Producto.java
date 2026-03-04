@@ -13,7 +13,8 @@ public class Producto {
     private int stock;
     private int estado; // 1 = disponible, 0 = no disponible
 
-    public Producto() {}
+    public Producto() {
+    }
 
     public Producto(int id, String nombre, double precio, CategoriaProducto categoria, int stock, int estado) {
         this.id = id;
@@ -34,28 +35,60 @@ public class Producto {
 
     // ===== Getters & Setters =====
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getId() {
+        return id;
+    }
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public double getPrecio() { return precio; }
-    public void setPrecio(double precio) { this.precio = precio; }
+    public String getNombre() {
+        return nombre;
+    }
 
-    public CategoriaProducto getCategoria() { return categoria; }
-    public void setCategoria(CategoriaProducto categoria) { this.categoria = categoria; }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-    public int getStock() { return stock; }
-    public void setStock(int stock) { this.stock = stock; }
+    public double getPrecio() {
+        return precio;
+    }
 
-    public int getEstado() { return estado; }
-    public void setEstado(int estado) { this.estado = estado; }
+    public void setPrecio(double precio) {
+        this.precio = precio;
+    }
 
-    public boolean isDisponible() { return estado == 1 && stock > 0; }
+    public CategoriaProducto getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(CategoriaProducto categoria) {
+        this.categoria = categoria;
+    }
+
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
+    }
+
+    public int getEstado() {
+        return estado;
+    }
+
+    public void setEstado(int estado) {
+        this.estado = estado;
+    }
+
+    public boolean isDisponible() {
+        return estado == 1 && stock > 0;
+    }
 
     @Override
     public String toString() {
-        return nombre + " ($" + String.format("%.2f", precio) + ")";
+        return nombre + " ($" + String.format("%.0f", precio) + ")";
     }
 }
