@@ -29,6 +29,7 @@ public class MenuPuntoVenta extends JFrame {
     private static final String PANEL_FACTURACION = "facturacion";
     private static final String PANEL_RESUMEN = "resumen";
     private static final String PANEL_DESEMPENO = "desempeno";
+    private static final String PANEL_EMPLEADOS = "empleados";
     private static final String PANEL_ACERCA = "acerca";
 
     public MenuPuntoVenta() {
@@ -81,6 +82,7 @@ public class MenuPuntoVenta extends JFrame {
         contentPanel.add(new PanelResumen(), PANEL_RESUMEN);
         if (SesionManager.esGerente()) {
             contentPanel.add(new PanelDesempeno(), PANEL_DESEMPENO);
+            contentPanel.add(new PanelEmpleados(), PANEL_EMPLEADOS);
         }
         contentPanel.add(crearPanelAcerca(), PANEL_ACERCA);
 
@@ -152,6 +154,7 @@ public class MenuPuntoVenta extends JFrame {
         sidebar.add(crearBotonSidebar("Resumen", "resumen", PANEL_RESUMEN, "Resumen"));
         if (SesionManager.esGerente()) {
             sidebar.add(crearBotonSidebar("Desempeño", "desempeno", PANEL_DESEMPENO, "Desempeño de Meseros"));
+            sidebar.add(crearBotonSidebar("Empleados", "empleados", PANEL_EMPLEADOS, "Gestión de Empleados"));
         }
 
         sidebar.add(Box.createVerticalGlue());

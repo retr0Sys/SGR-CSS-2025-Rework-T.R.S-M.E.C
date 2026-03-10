@@ -7,8 +7,16 @@ import com.css.restaurante.ui.InputValidator;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.*;
+import java.security.SecureRandom;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * DAO para autenticación de empleados.
@@ -178,5 +186,220 @@ public class EmpleadoDAO {
             sb.append(String.format("%02x", b));
         }
         return sb.toString();
+    }
+
+    // ===== GESTIÓN DE EMPLEADOS =====
+
+    /**
+     * Devuelve una lista de todos los empleados.
+     */
+    public List<Empleado> listar() throws SQLException {
+        String sql = "SELECT id_empleado, usuario, nombre, apellido, cargo, activo FROM empleado ORDER BY id_empleado";
+        List<Empleado> lista = new ArrayList<>();
+        try (Connection cn = ConexionDB.getConnection();
+                Statement st = cn.createStatement();
+                ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                lista.add(new Empleado(
+                        rs.getInt("id_empleado"),
+                        rs.getString("usuario"),
+                        rs.getString("nombre"),
+                        rs.getString("apellido"),
+                        CargoEmpleado.fromString(rs.getString("cargo")),
+                        rs.getBoolean("activo")));
+            }
+        }
+        return lista;
+    }
+
+    /**
+     * Busca un empleado por su nombre de usuario, insensible a
+     * mayúsculas/minúsculas.
+     */
+    public Empleado buscarPorUsuario(String usuario) throws SQLException {
+        String sql = "SELECT id_empleado, usuario, nombre, apellido, cargo, activo FROM empleado WHERE LOWER(usuario) = LOWER(?)";
+        try (Connection cn = ConexionDB.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, usuario);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Empleado(
+                            rs.getInt("id_empleado"),
+                            rs.getString("usuario"),
+                            rs.getString("nombre"),
+                            rs.getString("apellido"),
+                            CargoEmpleado.fromString(rs.getString("cargo")),
+                            rs.getBoolean("activo"));
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Genera un salt aleatorio seguro de 16 bytes.
+     */
+    private String generarSalt() {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+        return bytesToHex(salt);
+    }
+
+    /**
+     * Crea un nuevo empleado e inicializa su historial de contraseñas.
+     */
+    public void crear(Empleado e, char[] contrasena) throws SQLException {
+        String sqlEmpleado = "INSERT INTO empleado (usuario, contrasena_hash, salt, nombre, apellido, cargo, activo, intentos_fallidos) "
+                +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, 0)";
+        String sqlHistorial = "INSERT INTO historial_contrasena (id_empleado, contrasena_hash, salt) VALUES (?, ?, ?)";
+
+        String salt = generarSalt();
+        String hash = hashSHA256(salt, contrasena);
+
+        try (Connection cn = ConexionDB.getConnection()) {
+            cn.setAutoCommit(false); // Iniciar transacción
+            try (PreparedStatement psEmpleado = cn.prepareStatement(sqlEmpleado, Statement.RETURN_GENERATED_KEYS)) {
+                psEmpleado.setString(1, e.getUsuario());
+                psEmpleado.setString(2, hash);
+                psEmpleado.setString(3, salt);
+                psEmpleado.setString(4, e.getNombre());
+                psEmpleado.setString(5, e.getApellido());
+                psEmpleado.setString(6, e.getCargo().getValor());
+                psEmpleado.setBoolean(7, e.isActivo());
+
+                psEmpleado.executeUpdate();
+
+                try (ResultSet keys = psEmpleado.getGeneratedKeys()) {
+                    if (keys.next()) {
+                        e.setIdEmpleado(keys.getInt(1));
+                    }
+                }
+
+                // Guardar primer registro en historial
+                try (PreparedStatement psHistorial = cn.prepareStatement(sqlHistorial)) {
+                    psHistorial.setInt(1, e.getIdEmpleado());
+                    psHistorial.setString(2, hash);
+                    psHistorial.setString(3, salt);
+                    psHistorial.executeUpdate();
+                }
+
+                cn.commit(); // Confirmar transacción
+            } catch (SQLException ex) {
+                cn.rollback();
+                throw ex;
+            } finally {
+                cn.setAutoCommit(true);
+            }
+        } finally {
+            Arrays.fill(contrasena, '\0');
+        }
+    }
+
+    /**
+     * Elimina físicamente un empleado por su ID.
+     */
+    public void eliminar(int idEmpleado) throws SQLException {
+        String sql = "DELETE FROM empleado WHERE id_empleado = ?";
+        try (Connection cn = ConexionDB.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, idEmpleado);
+            ps.executeUpdate();
+        }
+    }
+
+    /**
+     * Cambia el estado (activo/inactivo) de un empleado.
+     */
+    public void cambiarEstado(int idEmpleado, boolean activo) throws SQLException {
+        String sql = "UPDATE empleado SET activo = ? WHERE id_empleado = ?";
+        try (Connection cn = ConexionDB.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setBoolean(1, activo);
+            ps.setInt(2, idEmpleado);
+            ps.executeUpdate();
+        }
+    }
+
+    /**
+     * Verifica si una contraseña ya fue utilizada recientemente (últimas 10
+     * contraseñas).
+     */
+    public boolean esContrasenaRepetida(int idEmpleado, char[] nuevaContrasena) throws SQLException {
+        String sql = "SELECT contrasena_hash, salt FROM historial_contrasena WHERE id_empleado = ? ORDER BY fecha_cambio DESC LIMIT 10";
+        try (Connection cn = ConexionDB.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, idEmpleado);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String hashGuardado = rs.getString("contrasena_hash");
+                    String saltGuardado = rs.getString("salt");
+                    String inputHash = hashSHA256(saltGuardado, nuevaContrasena);
+
+                    if (MessageDigest.isEqual(
+                            hashGuardado.getBytes(StandardCharsets.UTF_8),
+                            inputHash.getBytes(StandardCharsets.UTF_8))) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Cambia la contraseña de un empleado, validando contra su historial y
+     * registrándola en él.
+     */
+    public void cambiarContrasena(int idEmpleado, char[] nuevaContrasena) throws SQLException {
+        if (esContrasenaRepetida(idEmpleado, nuevaContrasena)) {
+            throw new IllegalArgumentException("La nueva contraseña no puede ser igual a una de las últimas");
+        }
+
+        String sqlUpdate = "UPDATE empleado SET contrasena_hash = ?, salt = ? WHERE id_empleado = ?";
+        String sqlHistorialInsert = "INSERT INTO historial_contrasena (id_empleado, contrasena_hash, salt) VALUES (?, ?, ?)";
+        String sqlHistorialClean = "DELETE FROM historial_contrasena WHERE id_empleado = ? AND id_historial NOT IN " +
+                "(SELECT id_historial FROM historial_contrasena WHERE id_empleado = ? ORDER BY fecha_cambio DESC LIMIT 10)";
+
+        String nuevoSalt = generarSalt();
+        String nuevoHash = hashSHA256(nuevoSalt, nuevaContrasena);
+
+        try (Connection cn = ConexionDB.getConnection()) {
+            cn.setAutoCommit(false);
+            try {
+                // Actualizar la contraseña en la tabla principal
+                try (PreparedStatement psUpdate = cn.prepareStatement(sqlUpdate)) {
+                    psUpdate.setString(1, nuevoHash);
+                    psUpdate.setString(2, nuevoSalt);
+                    psUpdate.setInt(3, idEmpleado);
+                    psUpdate.executeUpdate();
+                }
+
+                // Guardar la nueva contraseña en el historial
+                try (PreparedStatement psInsert = cn.prepareStatement(sqlHistorialInsert)) {
+                    psInsert.setInt(1, idEmpleado);
+                    psInsert.setString(2, nuevoHash);
+                    psInsert.setString(3, nuevoSalt);
+                    psInsert.executeUpdate();
+                }
+
+                // Limpiar el historial, dejando solo las últimas 10 contraseñas
+                try (PreparedStatement psClean = cn.prepareStatement(sqlHistorialClean)) {
+                    psClean.setInt(1, idEmpleado);
+                    psClean.setInt(2, idEmpleado);
+                    psClean.executeUpdate();
+                }
+
+                cn.commit();
+            } catch (SQLException ex) {
+                cn.rollback();
+                throw ex;
+            } finally {
+                cn.setAutoCommit(true);
+            }
+        } finally {
+            Arrays.fill(nuevaContrasena, '\0');
+        }
     }
 }

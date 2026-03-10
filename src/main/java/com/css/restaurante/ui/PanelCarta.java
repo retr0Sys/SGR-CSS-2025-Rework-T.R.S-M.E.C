@@ -270,6 +270,14 @@ public class PanelCarta extends JPanel implements MenuPuntoVenta.Refrescable {
         }
 
         try {
+            // Validación de duplicados (insensible a mayúsculas/minúsculas desde el DAO)
+            Producto existente = productoDAO.buscarPorNombre(nombre);
+            if (existente != null) {
+                JOptionPane.showMessageDialog(this, "Ya existe un producto con el nombre: " + nombre,
+                        "Producto Duplicado", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             double precio = InputValidator.parsePrecio(precioStr);
             int stock = InputValidator.parseStock(stockStr);
             CategoriaProducto cat = CategoriaProducto.fromString(

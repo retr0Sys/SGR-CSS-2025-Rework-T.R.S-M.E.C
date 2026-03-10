@@ -141,3 +141,23 @@ INSERT INTO empleado (usuario, contrasena_hash, salt, nombre, apellido, cargo) V
     ('admin',   ENCODE(DIGEST('a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6' || 'admin123', 'sha256'), 'hex'), 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6', 'Administrador', 'General', 'gerente'),
     ('cajero1', ENCODE(DIGEST('f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1' || '1234', 'sha256'), 'hex'),     'f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1', 'Laura',         'Gómez',   'cajero'),
     ('mesero1', ENCODE(DIGEST('1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d' || '1234', 'sha256'), 'hex'),     '1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d', 'Carlos',        'González', 'mesero');
+
+-- =====================================================
+-- TABLA: historial_contrasena
+-- Controla la repetición de las últimas contraseñas de los
+-- empleados mediante almacenamiento de su hash y salt
+-- =====================================================
+CREATE TABLE IF NOT EXISTS historial_contrasena (
+    id_historial    SERIAL PRIMARY KEY,
+    id_empleado     INTEGER      NOT NULL REFERENCES empleado(id_empleado) ON DELETE CASCADE,
+    contrasena_hash VARCHAR(128) NOT NULL,
+    salt            VARCHAR(32)  NOT NULL,
+    fecha_cambio    TIMESTAMP    NOT NULL DEFAULT NOW()
+);
+
+-- Migración inicial para empleados existentes
+INSERT INTO historial_contrasena (id_empleado, contrasena_hash, salt)
+SELECT id_empleado, contrasena_hash, salt FROM empleado
+WHERE NOT EXISTS (
+    SELECT 1 FROM historial_contrasena WHERE historial_contrasena.id_empleado = empleado.id_empleado
+);

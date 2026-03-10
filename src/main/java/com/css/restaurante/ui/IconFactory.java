@@ -39,6 +39,7 @@ public class IconFactory {
             case "desempeno" -> dibujarDesempeno(g, s);
             case "logout" -> dibujarLogout(g, s);
             case "login" -> dibujarLogin(g, s);
+            case "empleados" -> dibujarLogin(g, s);
         }
         g.dispose();
         return new ImageIcon(img);
