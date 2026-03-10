@@ -195,6 +195,7 @@ public class MenuPuntoVenta extends JFrame {
             int resp = JOptionPane.showConfirmDialog(this, "¿Estás seguro que deseas cerrar sesión?",
                     "Cerrar Sesión", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (resp == JOptionPane.YES_OPTION) {
+                AuditLogger.cerrarSesion(SesionManager.getNombreDisplay());
                 SesionManager.cerrarSesion();
                 dispose();
                 SwingUtilities.invokeLater(() -> new PanelLogin().setVisible(true));
@@ -334,6 +335,32 @@ public class MenuPuntoVenta extends JFrame {
     }
 
     private void cambiarModulo(String panelKey, String titulo) {
+        // SEC-3: Verificar sesión antes de cambiar de módulo
+        if (!SesionManager.verificarSesion()) {
+            JOptionPane.showMessageDialog(this,
+                    "Su sesión ha expirado por inactividad.\nPor favor, inicie sesión nuevamente.",
+                    "Sesión Expirada", JOptionPane.WARNING_MESSAGE);
+            dispose();
+            SwingUtilities.invokeLater(() -> new PanelLogin().setVisible(true));
+            return;
+        }
+        SesionManager.registrarActividad();
+
+        // SEC-5: Verificar permisos RBAC para paneles restringidos
+        if ((PANEL_EMPLEADOS.equals(panelKey) || PANEL_DESEMPENO.equals(panelKey))
+                && !SesionManager.esGerente()) {
+            JOptionPane.showMessageDialog(this,
+                    "No tiene permisos para acceder a este módulo.",
+                    "Acceso Denegado", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (PANEL_FACTURACION.equals(panelKey) && !SesionManager.puedeFacturar()) {
+            JOptionPane.showMessageDialog(this,
+                    "No tiene permisos para acceder a este módulo.",
+                    "Acceso Denegado", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         cardLayout.show(contentPanel, panelKey);
         if (lblHeaderTitle != null)
             lblHeaderTitle.setText(titulo);

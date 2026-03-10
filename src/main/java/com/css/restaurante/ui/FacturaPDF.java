@@ -132,9 +132,11 @@ public class FacturaPDF {
         cs.close();
 
         // ── Guardar en Documentos/Facturas ──
+        // SEC-6: Sanitizar el ID de mesa para prevenir path traversal
+        String mesaIdSafe = String.valueOf(idMesa).replaceAll("[^0-9]", "");
         String dir = Paths.get(System.getProperty("user.home"), "Documents", "Facturas").toString();
         new File(dir).mkdirs();
-        String path = Paths.get(dir, "Factura_Mesa" + idMesa + "_"
+        String path = Paths.get(dir, "Factura_Mesa" + mesaIdSafe + "_"
                 + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".pdf").toString();
         doc.save(path);
         doc.close();

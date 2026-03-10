@@ -202,7 +202,8 @@ public class PanelDesempeno extends JPanel implements MenuPuntoVenta.Refrescable
                 }
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            System.err.println("[SGR] Error en consulta: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al cargar datos. Contacte al administrador.");
         }
     }
 
@@ -243,7 +244,8 @@ public class PanelDesempeno extends JPanel implements MenuPuntoVenta.Refrescable
                 }
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            System.err.println("[SGR] Error en consulta: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al cargar datos. Contacte al administrador.");
         }
     }
 
@@ -277,7 +279,8 @@ public class PanelDesempeno extends JPanel implements MenuPuntoVenta.Refrescable
                 pos++;
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            System.err.println("[SGR] Error en consulta: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al cargar datos. Contacte al administrador.");
         }
     }
 

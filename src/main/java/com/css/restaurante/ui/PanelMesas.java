@@ -82,7 +82,8 @@ public class PanelMesas extends JPanel implements MenuPuntoVenta.Refrescable {
                 gridPanel.add(crearTarjetaMesa(mesa));
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error al cargar mesas: " + ex.getMessage());
+            System.err.println("[SGR] Error al cargar mesas: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al cargar mesas. Contacte al administrador.");
         }
         gridPanel.revalidate();
         gridPanel.repaint();
@@ -245,7 +246,8 @@ public class PanelMesas extends JPanel implements MenuPuntoVenta.Refrescable {
                 cbEstado.setEnabled(false); // Bloquear una vez abierta la cuenta
                 JOptionPane.showMessageDialog(dialog, "Cuenta #" + c.getIdCuenta() + " abierta.");
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(dialog, "Error: " + ex.getMessage());
+                System.err.println("[SGR] Error al abrir cuenta: " + ex.getMessage());
+                JOptionPane.showMessageDialog(dialog, "Error al abrir cuenta. Contacte al administrador.");
             }
         });
         panel.add(btnAbrir);
@@ -339,7 +341,8 @@ public class PanelMesas extends JPanel implements MenuPuntoVenta.Refrescable {
                     recargarPedidos.run();
                     JOptionPane.showMessageDialog(dialog, "Pedido eliminado.");
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(dialog, "Error: " + ex.getMessage());
+                    System.err.println("[SGR] Error al eliminar pedido: " + ex.getMessage());
+                    JOptionPane.showMessageDialog(dialog, "Error al eliminar pedido. Contacte al administrador.");
                 }
             }
         });
@@ -367,7 +370,8 @@ public class PanelMesas extends JPanel implements MenuPuntoVenta.Refrescable {
                 abrirDialogoPedido(dialog, idCuenta);
                 recargarPedidos.run();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(dialog, "Error: " + ex.getMessage());
+                System.err.println("[SGR] Error al agregar pedido: " + ex.getMessage());
+                JOptionPane.showMessageDialog(dialog, "Error al agregar pedido. Contacte al administrador.");
             }
         });
         panelBotonesPedido.add(btnAgregar);
@@ -414,7 +418,13 @@ public class PanelMesas extends JPanel implements MenuPuntoVenta.Refrescable {
                         cuentaDAO.desasignarMesero(mesa.getIdMesa());
                     }
                 } else if (meseroSel != null) {
-                    int idMesero = Integer.parseInt(meseroSel.split(" - ")[0]);
+                int idMesero;
+                try {
+                    idMesero = Integer.parseInt(meseroSel.split(" - ")[0]);
+                } catch (NumberFormatException nfe) {
+                    JOptionPane.showMessageDialog(dialog, "Error al procesar mesero seleccionado.");
+                    return;
+                }
                     mesaDAO.asignarMesero(mesa.getIdMesa(), idMesero);
                     if (tieneCuentaActiva) {
                         cuentaDAO.actualizarMesero(mesa.getIdMesa(), idMesero);
@@ -424,7 +434,8 @@ public class PanelMesas extends JPanel implements MenuPuntoVenta.Refrescable {
                 dialog.dispose();
                 cargarMesas();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(dialog, "Error: " + ex.getMessage());
+                System.err.println("[SGR] Error al guardar cambios: " + ex.getMessage());
+                JOptionPane.showMessageDialog(dialog, "Error al guardar cambios. Contacte al administrador.");
             }
         });
         panel.add(btnGuardar);
@@ -541,7 +552,8 @@ public class PanelMesas extends JPanel implements MenuPuntoVenta.Refrescable {
                         itemsPendientes.size() + " producto(s) enviados a cocina.");
                 d.dispose();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(d, "Error: " + ex.getMessage());
+                System.err.println("[SGR] Error en pedido: " + ex.getMessage());
+                JOptionPane.showMessageDialog(d, "Error al procesar pedido. Contacte al administrador.");
             }
         });
         panel.add(btnEnviar);

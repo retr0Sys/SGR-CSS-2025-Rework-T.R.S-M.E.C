@@ -66,7 +66,8 @@ public class PanelCocina extends JPanel implements MenuPuntoVenta.Refrescable {
             List<Pedido> pedidos = pedidoDAO.listarPendientes();
             modelo.setRowCount(0);
             for (Pedido p : pedidos) {
-                int mesa = pedidoDAO.obtenerMesaDePedido(p.getIdPedido());
+                // OPT-3: idMesa ya viene cargado por JOIN en listarPendientes()
+                int mesa = p.getIdMesa();
                 modelo.addRow(new Object[] {
                         p.getIdPedido(), "Mesa " + mesa, p.getNombreProducto(),
                         p.getCantidad(), p.getEstado().toString(),
@@ -95,7 +96,8 @@ public class PanelCocina extends JPanel implements MenuPuntoVenta.Refrescable {
                     "Estado actualizado", JOptionPane.INFORMATION_MESSAGE);
             cargarPedidos();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            System.err.println("[SGR] Error al actualizar estado: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al actualizar estado. Contacte al administrador.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

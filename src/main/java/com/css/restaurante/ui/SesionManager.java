@@ -6,10 +6,13 @@ import com.css.restaurante.modelo.Empleado;
 /**
  * Singleton que gestiona la sesión del empleado actualmente logueado.
  * Centraliza la verificación de permisos por cargo.
+ * Implementa timeout de sesión por inactividad (30 min configurables).
  */
 public final class SesionManager {
 
     private static Empleado empleadoActual;
+    private static long ultimaActividad;
+    private static final long TIMEOUT_MS = 30 * 60 * 1000; // 30 minutos
 
     private SesionManager() {
     }
@@ -19,6 +22,7 @@ public final class SesionManager {
      */
     public static void iniciarSesion(Empleado empleado) {
         empleadoActual = empleado;
+        ultimaActividad = System.currentTimeMillis();
     }
 
     /**
@@ -26,6 +30,34 @@ public final class SesionManager {
      */
     public static void cerrarSesion() {
         empleadoActual = null;
+        ultimaActividad = 0;
+    }
+
+    /**
+     * Registra actividad del usuario (resetea el timer de inactividad).
+     * Debe llamarse al cambiar de módulo o realizar acciones.
+     */
+    public static void registrarActividad() {
+        if (empleadoActual != null) {
+            ultimaActividad = System.currentTimeMillis();
+        }
+    }
+
+    /**
+     * Verifica si la sesión sigue activa (no expirada por inactividad).
+     * Retorna false si expiró o no hay sesión.
+     */
+    public static boolean verificarSesion() {
+        if (empleadoActual == null) return false;
+        long inactividad = System.currentTimeMillis() - ultimaActividad;
+        if (inactividad > TIMEOUT_MS) {
+            // Sesión expirada — registrar y limpiar
+            AuditLogger.registrar(empleadoActual.getUsuario(), "SESION_EXPIRADA",
+                    "Sesión expirada por inactividad (" + (inactividad / 60000) + " min)");
+            cerrarSesion();
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -36,7 +68,7 @@ public final class SesionManager {
     }
 
     /**
-     * Verifica si hay una sesión activa.
+     * Verifica si hay una sesión activa (sin verificar timeout).
      */
     public static boolean haySesion() {
         return empleadoActual != null;

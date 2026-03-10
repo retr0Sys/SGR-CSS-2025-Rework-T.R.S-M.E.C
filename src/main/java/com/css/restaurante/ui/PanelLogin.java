@@ -222,6 +222,7 @@ public class PanelLogin extends JFrame {
         try {
             // Verificar bloqueo antes de intentar
             if (empleadoDAO.verificarBloqueo(usuario)) {
+                AuditLogger.cuentaBloqueada(usuario);
                 mostrarError("\u26A0 Cuenta bloqueada temporalmente. Intente en 1 minuto.");
                 return;
             }
@@ -229,10 +230,12 @@ public class PanelLogin extends JFrame {
             Empleado empleado = empleadoDAO.autenticar(usuario, contrasena);
             // contrasena ya fue limpiado internamente por EmpleadoDAO
             if (empleado != null) {
+                AuditLogger.loginExitoso(usuario);
                 SesionManager.iniciarSesion(empleado);
                 dispose();
                 SwingUtilities.invokeLater(() -> new MenuPuntoVenta().setVisible(true));
             } else {
+                AuditLogger.loginFallido(usuario);
                 // Mensaje gen\u00e9rico \u2014 no revelar si el usuario existe o no
                 mostrarError("Credenciales inv\u00e1lidas.");
                 txtContrasena.setText("");
@@ -240,7 +243,7 @@ public class PanelLogin extends JFrame {
             }
         } catch (Exception ex) {
             mostrarError("Error de conexi\u00f3n. Intente m\u00e1s tarde.");
-            // No loguear detalles de la excepci\u00f3n (puede contener info sensible)
+            System.err.println("[SGR] Error en autenticación.");
         }
     }
 

@@ -117,4 +117,52 @@ public final class InputValidator {
         }
         return null; // Todo válido
     }
+
+    // ═══ Validación de Seguridad ═══
+
+    /**
+     * Valida complejidad de contraseña:
+     * - Mínimo 8 caracteres
+     * - Al menos una mayúscula, una minúscula, un dígito
+     */
+    public static boolean esContrasenaSegura(char[] contrasena) {
+        if (contrasena == null || contrasena.length < 8) return false;
+        boolean tieneUpper = false, tieneLower = false, tieneDigit = false;
+        for (char c : contrasena) {
+            if (Character.isUpperCase(c)) tieneUpper = true;
+            else if (Character.isLowerCase(c)) tieneLower = true;
+            else if (Character.isDigit(c)) tieneDigit = true;
+        }
+        return tieneUpper && tieneLower && tieneDigit;
+    }
+
+    /**
+     * Retorna mensaje descriptivo si la contraseña no cumple complejidad.
+     * Retorna null si es segura.
+     */
+    public static String mensajeContrasenaInsegura(char[] contrasena) {
+        if (contrasena == null || contrasena.length < 8) {
+            return "La contraseña debe tener al menos 8 caracteres.";
+        }
+        boolean tieneUpper = false, tieneLower = false, tieneDigit = false;
+        for (char c : contrasena) {
+            if (Character.isUpperCase(c)) tieneUpper = true;
+            else if (Character.isLowerCase(c)) tieneLower = true;
+            else if (Character.isDigit(c)) tieneDigit = true;
+        }
+        if (!tieneUpper) return "La contraseña debe contener al menos una letra mayúscula.";
+        if (!tieneLower) return "La contraseña debe contener al menos una letra minúscula.";
+        if (!tieneDigit) return "La contraseña debe contener al menos un dígito.";
+        return null;
+    }
+
+    /**
+     * Valida nombre de usuario (alfanumérico + guion bajo, 3-30 caracteres).
+     */
+    public static boolean esUsuarioValido(String usuario) {
+        if (usuario == null || usuario.trim().isEmpty()) return false;
+        String clean = usuario.trim();
+        return clean.length() >= 3 && clean.length() <= 30
+                && clean.matches("^[a-zA-Z0-9_]+$");
+    }
 }

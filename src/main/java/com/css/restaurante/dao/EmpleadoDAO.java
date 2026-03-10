@@ -161,9 +161,15 @@ public class EmpleadoDAO {
     static String hashSHA256(String salt, char[] contrasena) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-            // Construir salt + contraseña sin crear String de la contraseña
             byte[] saltBytes = salt.getBytes(StandardCharsets.UTF_8);
-            byte[] passBytes = new String(contrasena).getBytes(StandardCharsets.UTF_8);
+            // Convertir char[] a byte[] SIN crear String intermedio (inmutable en heap)
+            java.nio.CharBuffer charBuf = java.nio.CharBuffer.wrap(contrasena);
+            java.nio.ByteBuffer byteBuf = StandardCharsets.UTF_8.encode(charBuf);
+            byte[] passBytes = new byte[byteBuf.remaining()];
+            byteBuf.get(passBytes);
+            // Limpiar buffer intermedio
+            Arrays.fill(byteBuf.array(), (byte) 0);
+
             byte[] entrada = new byte[saltBytes.length + passBytes.length];
             System.arraycopy(saltBytes, 0, entrada, 0, saltBytes.length);
             System.arraycopy(passBytes, 0, entrada, saltBytes.length, passBytes.length);

@@ -157,7 +157,8 @@ public class PanelFacturacion extends JPanel implements MenuPuntoVenta.Refrescab
                 }
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            System.err.println("[SGR] Error al cargar mesas: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al cargar datos. Contacte al administrador.");
         }
     }
 
@@ -190,7 +191,8 @@ public class PanelFacturacion extends JPanel implements MenuPuntoVenta.Refrescab
             }
             actualizarTotales();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            System.err.println("[SGR] Error al cargar pedidos: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al cargar pedidos. Contacte al administrador.");
         }
     }
 
@@ -290,7 +292,8 @@ public class PanelFacturacion extends JPanel implements MenuPuntoVenta.Refrescab
             actualizarTotales();
             cargarMesas();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(),
+            System.err.println("[SGR] Error al cerrar cuenta: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al cerrar cuenta. Contacte al administrador.",
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }

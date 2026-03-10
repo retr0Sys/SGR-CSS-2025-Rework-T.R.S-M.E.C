@@ -237,7 +237,8 @@ public class PanelCarta extends JPanel implements MenuPuntoVenta.Refrescable {
                 });
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error al cargar productos: " + ex.getMessage(),
+            System.err.println("[SGR] Error al cargar productos: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al cargar productos. Contacte al administrador.",
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -290,7 +291,8 @@ public class PanelCarta extends JPanel implements MenuPuntoVenta.Refrescable {
             limpiarFormulario();
             cargarProductos(null);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error al crear producto: " + ex.getMessage(),
+            System.err.println("[SGR] Error al crear producto: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al crear producto. Contacte al administrador.",
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -322,7 +324,8 @@ public class PanelCarta extends JPanel implements MenuPuntoVenta.Refrescable {
             limpiarFormulario();
             cargarProductos(null);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error al modificar: " + ex.getMessage(),
+            System.err.println("[SGR] Error al modificar producto: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al modificar producto. Contacte al administrador.",
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -350,11 +353,13 @@ public class PanelCarta extends JPanel implements MenuPuntoVenta.Refrescable {
                                     "Se recomienda marcar el producto como 'No disponible'.",
                             "Error de Integridad", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(this, "Error al eliminar: " + ex.getMessage(),
+                    System.err.println("[SGR] Error al eliminar producto: " + ex.getMessage());
+                    JOptionPane.showMessageDialog(this, "Error al eliminar producto. Contacte al administrador.",
                             "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error inesperado al eliminar: " + ex.getMessage(),
+                System.err.println("[SGR] Error inesperado: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this, "Error inesperado. Contacte al administrador.",
                         "Error", JOptionPane.ERROR_MESSAGE);
             }
         }

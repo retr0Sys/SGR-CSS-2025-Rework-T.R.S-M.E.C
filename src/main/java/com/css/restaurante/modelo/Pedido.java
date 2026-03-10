@@ -18,6 +18,9 @@ public class Pedido {
     private String nombreProducto;
     private double precioProducto;
 
+    // Dato auxiliar de mesa (cargado por JOIN en listarPendientes)
+    private int idMesa = -1;
+
     public Pedido() {}
 
     public Pedido(int idPedido, int idCuenta, int idProducto, int cantidad,
@@ -65,6 +68,9 @@ public class Pedido {
     public void setPrecioProducto(double precioProducto) { this.precioProducto = precioProducto; }
 
     public double getSubtotal() { return precioProducto * cantidad; }
+
+    public int getIdMesa() { return idMesa; }
+    public void setIdMesa(int idMesa) { this.idMesa = idMesa; }
 
     @Override
     public String toString() {

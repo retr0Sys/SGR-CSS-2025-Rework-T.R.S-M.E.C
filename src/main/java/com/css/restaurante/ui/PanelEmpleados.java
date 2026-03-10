@@ -222,7 +222,8 @@ public class PanelEmpleados extends JPanel implements MenuPuntoVenta.Refrescable
                 });
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error al cargar empleados: " + ex.getMessage(),
+            System.err.println("[SGR] Error al cargar empleados: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al cargar datos. Contacte al administrador.",
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -253,6 +254,25 @@ public class PanelEmpleados extends JPanel implements MenuPuntoVenta.Refrescable
             return;
         }
 
+        // SEC-9: Validar formato de usuario
+        if (!InputValidator.esUsuarioValido(usuario)) {
+            JOptionPane.showMessageDialog(this, "El usuario debe tener entre 3 y 30 caracteres alfanuméricos.", "Validación", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // SEC-9: Validar nombres
+        if (!InputValidator.esNombreValido(nombre) || !InputValidator.esNombreValido(apellido)) {
+            JOptionPane.showMessageDialog(this, "Nombre y apellido deben tener entre 1 y 50 caracteres válidos.", "Validación", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // SEC-2: Validar complejidad de contraseña
+        String msgContrasena = InputValidator.mensajeContrasenaInsegura(contrasena);
+        if (msgContrasena != null) {
+            JOptionPane.showMessageDialog(this, msgContrasena, "Contraseña Insegura", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         try {
             // Validación de duplicados (insensible a mayúsculas/minúsculas)
             Empleado existente = empleadoDAO.buscarPorUsuario(usuario);
@@ -268,12 +288,15 @@ public class PanelEmpleados extends JPanel implements MenuPuntoVenta.Refrescable
             Empleado e = new Empleado(0, usuario, nombre, apellido, cargo, activo);
             empleadoDAO.crear(e, contrasena);
             
+            AuditLogger.crearEmpleado(SesionManager.getNombreDisplay(), usuario);
             JOptionPane.showMessageDialog(this, "Empleado creado exitosamente.", "Éxito",
                     JOptionPane.INFORMATION_MESSAGE);
             limpiarFormulario();
             cargarEmpleados();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error al crear empleado: " + ex.getMessage(),
+            System.err.println("[SGR] Error al crear empleado: " + ex.getMessage());
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al crear empleado:\n" + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -298,12 +321,14 @@ public class PanelEmpleados extends JPanel implements MenuPuntoVenta.Refrescable
         if (confirm == JOptionPane.YES_OPTION) {
             try {
                 empleadoDAO.cambiarEstado(empleadoSeleccionadoId, nuevoEstado);
+                AuditLogger.cambiarEstadoEmpleado(SesionManager.getNombreDisplay(), empleadoSeleccionadoId, nuevoEstado);
                 JOptionPane.showMessageDialog(this, "Estado del empleado actualizado exitosamente.", "Éxito",
                         JOptionPane.INFORMATION_MESSAGE);
                 limpiarFormulario();
                 cargarEmpleados();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error al cambiar estado: " + ex.getMessage(),
+                System.err.println("[SGR] Error al cambiar estado: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this, "Error al cambiar estado. Contacte al administrador.",
                         "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -318,6 +343,13 @@ public class PanelEmpleados extends JPanel implements MenuPuntoVenta.Refrescable
             return;
         }
 
+        // SEC-2: Validar complejidad de nueva contraseña
+        String msgContrasena = InputValidator.mensajeContrasenaInsegura(nuevaContrasena);
+        if (msgContrasena != null) {
+            JOptionPane.showMessageDialog(this, msgContrasena, "Contraseña Insegura", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         int confirm = JOptionPane.showConfirmDialog(this,
                 "¿Está seguro que desea cambiar la contraseña de este empleado?",
                 "Confirmar Cambio de Contraseña", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -325,11 +357,13 @@ public class PanelEmpleados extends JPanel implements MenuPuntoVenta.Refrescable
         if (confirm == JOptionPane.YES_OPTION) {
             try {
                 empleadoDAO.cambiarContrasena(empleadoSeleccionadoId, nuevaContrasena);
+                AuditLogger.cambiarContrasena(SesionManager.getNombreDisplay(), empleadoSeleccionadoId);
                 JOptionPane.showMessageDialog(this, "Contraseña actualizada exitosamente.", "Éxito",
                         JOptionPane.INFORMATION_MESSAGE);
                 txtContrasena.setText("");
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error al cambiar contraseña: " + ex.getMessage(),
+                System.err.println("[SGR] Error al cambiar contraseña: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this, "Error al cambiar contraseña. Contacte al administrador.",
                         "Error", JOptionPane.ERROR_MESSAGE);
             }
         } else {
@@ -352,13 +386,15 @@ public class PanelEmpleados extends JPanel implements MenuPuntoVenta.Refrescable
 
         if (confirm == JOptionPane.YES_OPTION) {
             try {
+                AuditLogger.eliminarEmpleado(SesionManager.getNombreDisplay(), empleadoSeleccionadoId);
                 empleadoDAO.eliminar(empleadoSeleccionadoId);
                 JOptionPane.showMessageDialog(this, "Empleado eliminado exitosamente.", "Éxito",
                         JOptionPane.INFORMATION_MESSAGE);
                 limpiarFormulario();
                 cargarEmpleados();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error al eliminar: " + ex.getMessage(),
+                System.err.println("[SGR] Error al eliminar empleado: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this, "Error al eliminar empleado. Contacte al administrador.",
                         "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
